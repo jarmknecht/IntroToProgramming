@@ -1,0 +1,27 @@
+/* Jonathan Armknecht, Section 7, jonathan.armknecht@gmail.com
+Ready to grade
+Purpose: To reproduce the BYU Trivia questions and answers through basic C++ coding
+Inputs: No inputs
+Output: Text of BYU trivia questions with answers
+Test Cases: None due to no inputs
+*/
+
+#include <iostream>
+using namespace std;
+
+int main () {
+   
+   cout << "\t\t\t\tBasic BYU Trivia\n";
+   cout << "\n";
+   cout << "\t\tQuestions\t\t\t\tAnswers\n";
+   cout << "\n";
+   cout << "What was the original name of BYU?\t\tBrigham Young Academy\n";
+   cout << "When was BYU established?\t\t\t1875\n";
+   cout << "Who was the first \"permanent\" principal of BYA?\tKarl G. Maeser\n";
+   cout << "When did BYA become BYU?\t\t\t1903\n";
+   cout << "To what sports conference do we belong?\t\tIndependent (Football)\n";
+   cout << "When did BYU win the national football title?\t1984\n";
+   cout << "Who won the Heisman Trophy in 1990?\t\tTy Detmer\n";
+   
+   return 0;
+}
