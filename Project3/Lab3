@@ -1,0 +1,227 @@
+/* Jonathan Armknecht, Section 7, jonathan.armknecht@gmail.com
+Purpose: Help car buyer decided whether to buy a hybrid or non-hybrid car
+Inputs:
+   Miles driven per year
+   Price of gas during 5 years of ownership
+   Initial cost of hybrid car
+   Fuel efficiency of hybrid car
+   Resale value of hybrid car after 5 years
+   Initial cost of non-hybrid car
+   Fuel efficiency of non-hybrid car
+   Resale value of non-hybrid car after 5 years
+   Buyer's criterion of either minimized gas consumption or minimized total cost
+Outputs:
+   Prompt the user to re-enter values if negative or zero by printing out a warning if need be
+   Print out whether the car specifications are for the hybrid or non-hybrid car
+   Total gallons of fuel consumed over 5 years for the hybrid or non-hybrid car
+   Total cost of owning the hybrid or non-hybrid car for 5 years
+   Tell the buyer which car is better to purchase based on their criterion
+Test Cases:
+   Case 1
+      Inputs:
+         Miles driven per year = -10000, then 10000
+         Price of gas during 5 years of ownership = 0, then 3.14
+         Initial cost of hybrid car = -35000, then 35000
+         Fuel efficiency of hybrid car = -57.8, then 57.8
+         Resale value of hybrid car after 5 years = -23000, then 23000
+         Initial cost of non-hybrid car = -1, then 42500
+         Fuel efficiency of non-hybrid car = -10, then 25.6
+         Resale value of non-hybrid car after 5 years = -2200, then 22000
+         Buyer's criterion of either minimized gas consumption or minimized total cost = Gas
+      Expected Outputs:
+         All of the first numbers enter will show an error and prompt me to enter in a new value
+         Total gallons of fuel consumed over 5 years for hybrid = 865.05
+         Total gallons of fuel consumed over 5 years for non-hybrid = 1953.12
+         Total cost of owning hybrid = 14716.26
+         Total cost of owning non-hybrid = 26632.81
+         Which car to buy = HYBRID
+      Outputs:
+         All expected outputs were correct
+   Case 2
+      Inputs:
+         Miles driven per year = 12000
+         Price of gas during 5 years of ownership = 2.50 
+         Initial cost of hybrid car = 25000
+         Fuel efficiency of hybrid car = 50.8
+         Resale value of hybrid car after 5 years = 15000
+         Initial cost of non-hybrid car = 20000
+         Fuel efficiency of non-hybrid car = 23.7
+         Resale value of non-hybrid car after 5 years = 10000
+         Buyer's criterion of either minimized gas consumption or minimized total cost = Total
+      Expected Outputs:
+         Total gallons of fuel consumed over 5 years for hybrid = 1181.10
+         Total gallons of fuel consumed over 5 years for non-hybrid = 2531.65
+         Total cost of owning hybrid = 12952.76
+         Total cost of owning non-hybrid = 16329.11
+         Which car to buy = HYBRID
+      Outputs:
+         All expected outputs were correct
+   Case 3
+      Inputs:
+         Miles driven per year = 2000
+         Price of gas during 5 years of ownership = 1.50 
+         Initial cost of hybrid car = 70000
+         Fuel efficiency of hybrid car = 45.3
+         Resale value of hybrid car after 5 years = 15000
+         Initial cost of non-hybrid car = 18000
+         Fuel efficiency of non-hybrid car = 35.7
+         Resale value of non-hybrid car after 5 years = 12000
+         Buyer's criterion of either minimized gas consumption or minimized total cost = Total
+      Expected Outputs:
+         Total gallons of fuel consumed over 5 years for hybrid = 220.75
+         Total gallons of fuel consumed over 5 years for non-hybrid = 280.11
+         Total cost of owning hybrid = 55331.13
+         Total cost of owning non-hybrid = 6420.17
+         Which car to buy = NON-HYBRID
+      Outputs:
+         All expected outputs were correct
+*/
+#include <iostream>
+#include <string>
+#include <iomanip>
+using namespace std;
+
+int main () {
+
+   const double CAR_OWNED_YEARS = 5.0;
+
+   double milesPerYear = 0.0;
+   double priceOfGallonGas = 0.0;
+   double costOfHybrid = 0.0;
+   double hybridMilesPerGallon = 0.0;
+   double hybridResale = 0.0;
+   double costOfNonHybrid = 0.0;
+   double nonHybridMilesPerGallon = 0.0;
+   double nonHybridResale = 0.0;
+   double hybridFuelPerFiveYears = 0.0;
+   double totalCostHybrid = 0.0;
+   double hybridFuelFiveYearsCost = 0.0;
+   double hybridDepreciation = 0.0;
+   double nonHybridFuelPerFiveYears = 0.0;
+   double totalCostNonHybrid = 0.0;
+   double nonHybridFuelFiveYearsCost = 0.0;
+   double nonHybridDepreciation = 0.0;
+   string userCriterion;
+   
+   cout << "Please enter the following: " << endl << endl;
+   
+   cout << "The estimated miles driven per year: ";
+   cin >> milesPerYear; 
+   cout << endl << endl;
+   if (milesPerYear <= 0) {
+      cout << "I'm sorry, you must enter a value bigger than zero. Please try again. Please enter:" << endl;
+      cin >> milesPerYear;
+      cout << "The estimated miles driven per year: " << endl << endl;
+   }
+   
+   cout << "The estimated price of a gallon of gas during the 5 years of ownership: ";
+   cin >> priceOfGallonGas;
+   cout << endl << endl;
+   if (priceOfGallonGas <= 0) {
+      cout << "I'm sorry, you must enter a value bigger than zero. Please try again. Please enter:" << endl;
+      cin >> priceOfGallonGas;
+      cout << "The estimated price of a gallon of gas during the 5 years of ownership: " << endl << endl;
+   }
+   
+   cout << "The initial cost of a hybrid car: ";
+   cin >> costOfHybrid;
+   cout << endl << endl;
+   if (costOfHybrid <= 0) {
+      cout << "I'm sorry, you must enter a value bigger than zero. Please try again. Please enter:" << endl;
+      cin >> costOfHybrid;
+      cout << "The initial cost of a hybrid car: " << endl << endl;
+   }
+   
+   cout << "The efficiency of the hybrid car in miles per gallon: ";
+   cin >> hybridMilesPerGallon;
+   cout << endl << endl;
+   if (hybridMilesPerGallon <= 0) {
+      cout << "I'm sorry, you must enter a value bigger than zero. Please try again. Please enter:" << endl;
+      cin >> hybridMilesPerGallon;
+      cout << "The efficiency of the hybrid car in miles per gallon: " << endl << endl;
+   }
+   
+   cout << "The estimated resale value (a dollar amount) for a hybrid after 5 years: ";
+   cin >> hybridResale;
+   cout << endl << endl;
+   if (hybridResale <= 0) {
+      cout << "I'm sorry, you must enter a value bigger than zero. Please try again. Please enter:" << endl;
+      cin >> hybridResale;
+      cout << "The estimated resale value (a dollar amount) for a hybrid after 5 years: " << endl << endl;
+   }
+   
+   cout << "The initial cost of a non-hybrid car: ";
+   cin >> costOfNonHybrid;
+   cout << endl << endl;
+   if (costOfNonHybrid <= 0) {
+      cout << "I'm sorry, you must enter a value bigger than zero. Please try again. Please enter:" << endl;
+      cin >> costOfNonHybrid;
+      cout << "The initial cost of a non-hybrid car: " << endl << endl;
+   }
+   
+   cout << "The efficiency of the non-hybrid car in miles per gallon: ";
+   cin >> nonHybridMilesPerGallon;
+   cout << endl << endl;
+   if (nonHybridMilesPerGallon <= 0) {
+      cout << "I'm sorry, you must enter a value bigger than zero. Please try again. Please enter:" << endl;
+      cin >> nonHybridMilesPerGallon;
+      cout << "The efficiency of the non-hybrid car in miles per gallon: " << endl << endl;
+   }
+   
+   cout << "The estimated resale value (a dollar amount) for a non-hybrid after 5 years: ";
+   cin >> nonHybridResale;
+   cout << endl << endl;
+   if (nonHybridResale <= 0) {
+      cout << "I'm sorry, you must enter a value bigger than zero. Please try again. Please enter:" << endl;
+      cin >> nonHybridResale;
+      cout << "The estimated resale value (a dollar amount) for a non-hybrid after 5 years: " << endl << endl;
+   }
+   
+   cout << "The user's buying criterion, either minimized gas consumption or total cost (enter Gas or Total): ";
+   cin >> userCriterion;
+   cout << endl << endl;
+   if ((userCriterion != "Gas") && (userCriterion != "Total")) {
+      cout << "I'm sorry, you must enter either \"Gas\" or \"Total\". Please try again. Please enter:" << endl;
+      cin >> userCriterion;
+      cout << "The user's buying criterion, either minimized gas consumption of total cost (enter Gas or Total): "
+      << endl << endl;
+   }
+   
+   cout << fixed << setprecision(2);
+   
+   cout << "For the Hybrid Car:" << endl << endl;
+   
+   cout << "The total gallons of fuel consumed over 5 years: ";
+   hybridFuelPerFiveYears = (milesPerYear / hybridMilesPerGallon) * (CAR_OWNED_YEARS);
+   cout << hybridFuelPerFiveYears << endl;
+   
+   cout << "The total cost of owning the car for 5 years: ";
+   hybridFuelFiveYearsCost = hybridFuelPerFiveYears * priceOfGallonGas;
+   hybridDepreciation = costOfHybrid - hybridResale;
+   totalCostHybrid = hybridFuelFiveYearsCost + hybridDepreciation;
+   cout << totalCostHybrid << endl << endl;
+   
+   cout << "For the NON-Hybrid Car:" << endl << endl;
+   
+   cout << "The total gallons of fuel consumed over 5 years: ";
+   nonHybridFuelPerFiveYears = (milesPerYear / nonHybridMilesPerGallon) * (CAR_OWNED_YEARS);
+   cout << nonHybridFuelPerFiveYears << endl;
+   
+   cout << "The total cost of owning the car for 5 years: ";
+   nonHybridFuelFiveYearsCost = nonHybridFuelPerFiveYears * priceOfGallonGas;
+   nonHybridDepreciation = costOfNonHybrid - nonHybridResale;
+   totalCostNonHybrid = nonHybridFuelFiveYearsCost + nonHybridDepreciation;
+   cout << totalCostNonHybrid << endl << endl;
+   
+   if (((userCriterion == "Gas") && (hybridFuelPerFiveYears < nonHybridFuelPerFiveYears))
+      || ((userCriterion == "Total") && (totalCostHybrid < totalCostNonHybrid))) {
+      cout << "** The HYBRID Car is better than the NON-HYBRID Car when \"" << userCriterion
+      << "\" is the user's primary objective.";
+   }
+   else {
+      cout << "** The NON-HYBRID Car is better than the HYBRID Car when \"" << userCriterion
+      << "\" is the user's primary objective.";
+   }   
+   
+   return 0;
+}

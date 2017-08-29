@@ -1,0 +1,269 @@
+/* Jonathan Armknecht, Section 7, jonathan.armknecht@gmail.com
+ Purpose: To write a plinko program, using functions
+ 
+ Inputs:
+ 0- Exits program
+ 1- Drops Single Chip into one slot
+   0-8: Choices for which slot to drop chip in
+ 2- Drops Multiple Chips into one slot
+   Number > 0: User inputs number of chips they want to drop; 0-8: Choices for which slot to drop chips in
+ 3- Drops Multiple Chips into each slot
+   Number > 0: User inputs number of chips they want to drop
+ 
+ Outputs:
+ Welcomes user and prompts the user to enter in 0, 1, 2 or 3 to start program
+ For a single chip drop - prints out a prompt for the slot and the winnings
+ For multiple chips dropped into one slot - prints out a prompt for the number of chips and which slot. Finally,
+   prints out the total winnings for all the chips and the average winnings per chip.
+ For multiple chips dropped into each slot - prints out a prompt for the number of chips. Lastly, prints out
+   total winnings on each slot, and average winnings per chip in each slot.
+ For any invalid entry tells users to re-enter a correct entry.
+
+ Test Cases:
+   Case 1:
+      Inputs: The following is are inputs that test the possible incorrect input situations
+         5, 1, -5, 10, 4, 2, -4, test, 100, test, 3, 3, 100, 0
+      Outputs: An error message is given for each error, and there is a continous
+                  request until a correct input is given.
+   
+   Case 2:
+      Inputs: (using fixed seed of 42) 1, 3, 1, 8, 1, 0, 0
+      Expected Outputs:
+         Winnings: $10000.00
+         Winnings: $ 0.00
+         Winnings: $ 1000.00
+      Outputs are as expected
+   
+   Case 3:
+      Inputs: (using fixed seed of 42) 2, 100, 5, 3, 100, 0
+      Expected Outputs:
+         Total Winnings on 100 chips: 222200.00
+         Average winnings per chip: 2222.00
+         Total Winnings on slot 0 chips: 88700.00
+         Average winnings per chip: 887.00
+         Total Winnings on slot 1 chips: 85400.00
+         Average winnings per chip: 854.00
+         Total Winnings on slot 2 chips: 194000.00
+         Average winnings per chip: 1940.00
+         Total Winnings on slot 3 chips: 189400.00
+         Average winnings per chip: 1894.00
+         Total Winnings on slot 4 chips: 278900.00
+         Average winnings per chip: 2789.00
+         Total Winnings on slot 5 chips: 218200.00
+         Average winnings per chip: 2182.00
+         Total Winnings on slot 6 chips: 170700.00
+         Average winnings per chip: 1707.00
+         Total Winnings on slot 7 chips: 120700.00
+         Average winnings per chip: 1207.00
+         Total Winnings on slot 8 chips: 54700.00
+         Average winnings per chip: 547.00
+ */
+
+#include <iostream>
+#include <cstdlib>
+#include <iomanip>
+#include <limits>
+
+using namespace std;
+
+const int RANDOM_SEED = 42;
+const int PLINKO_ROWS = 12;
+const int EXIT_OPTION = 0;
+const int SINGLE_OPTION = 1;
+const int MULTIPLE_ONE_SLOT_OPTION = 2;
+const int MULTIPLE_ALL_SLOTS_OPTION = 3;
+const int MIN_COLUMN = 0;
+const int COLUMN_ONE = 1;
+const int COLUMN_TWO = 2;
+const int COLUMN_THREE = 3;
+const int COLUMN_FIVE = 5;
+const int COLUMN_SIX = 6;
+const int COLUMN_SEVEN = 7;
+const int MAX_COLUMN = 8;
+const int RAND_MODULO = 2;
+const double MOVING_LEFT_OR_RIGHT = 0.5;
+const double WALL_HIT = 1.0;
+const double SLOT_0_AND_8_WINNINGS = 100.0;
+const double SLOT_1_AND_7_WINNINGS = 500.0;
+const double SLOT_2_AND_6_WINNINGS = 1000.0;
+const double SLOT_3_AND_5_WINNINGS = 0.00;
+const double SLOT_4_WINNINGS = 10000.0;
+
+double ComputeWinnings(int slot) {
+   
+   double computedWinnings = 0.0;
+   
+   if ((slot == MIN_COLUMN) || (slot == MAX_COLUMN)) {
+      computedWinnings = SLOT_0_AND_8_WINNINGS;
+   }
+   else if ((slot == COLUMN_ONE) || (slot == COLUMN_SEVEN)) {
+      computedWinnings = SLOT_1_AND_7_WINNINGS;
+   }
+   else if ((slot == COLUMN_TWO) || (slot == COLUMN_SIX)) {
+      computedWinnings = SLOT_2_AND_6_WINNINGS;
+   }
+   else if ((slot == COLUMN_THREE) || (slot == COLUMN_FIVE)) {
+      computedWinnings = SLOT_3_AND_5_WINNINGS;
+   }
+   else {
+      computedWinnings = SLOT_4_WINNINGS;
+   }
+   
+   return computedWinnings;
+}
+
+double DropSingleChip(double currentCol, int userChoice = SINGLE_OPTION) {
+   
+   double directionMoved = 0.0;
+   const int SET_PRECISION = 2;
+   
+   for (int row = 0; row < PLINKO_ROWS; ++row) {
+      directionMoved = rand() % RAND_MODULO;
+      if (directionMoved == 0) {
+         currentCol = currentCol - MOVING_LEFT_OR_RIGHT;
+      }
+      else {
+         currentCol = currentCol + MOVING_LEFT_OR_RIGHT;
+      }
+      if (currentCol > MAX_COLUMN) {
+         currentCol = currentCol - WALL_HIT;
+      }
+      if (currentCol < MIN_COLUMN) {
+         currentCol = currentCol + WALL_HIT;
+      }
+   }
+   
+   if (userChoice == SINGLE_OPTION) {
+      cout << "WINNINGS: $";
+      cout << fixed << setprecision(SET_PRECISION);
+      cout << ComputeWinnings(currentCol) << endl << endl;
+   }
+   
+   return ComputeWinnings(currentCol);
+}
+
+void DropMultipleChips(int startingCol, int numOfChips, int userChoice) {
+   
+   int currentCol = 0;
+   double totalWinnings = 0.0;
+   double avgChipWinnings = 0.0;
+   const int SET_PRECISION = 2;
+   
+   for (int chip = 0; chip < numOfChips; ++chip) {
+      currentCol = startingCol;
+      totalWinnings = totalWinnings + DropSingleChip(currentCol, userChoice);
+   }
+   cout << fixed << setprecision(SET_PRECISION);
+   if (userChoice == MULTIPLE_ONE_SLOT_OPTION) {
+      cout << "Total Winnings on " << numOfChips << " chips: " << totalWinnings << endl;
+      avgChipWinnings = totalWinnings / numOfChips;
+      cout << "Average winnings per chip: " << avgChipWinnings << endl << endl;
+   }
+   else if (userChoice == MULTIPLE_ALL_SLOTS_OPTION) {
+      cout << "Total Winnings on slot " << startingCol << " chips: " << totalWinnings << endl;
+      avgChipWinnings = totalWinnings / numOfChips;
+      cout << "Average winnings per chip: " << avgChipWinnings << endl << endl;
+   }
+}
+
+int DropNumOfChips(int numOfChips = 0) {
+   
+   while (numOfChips <= 0) {
+      cout << "How many chips do you want to drop (>0)? ";
+      cin >> numOfChips;
+      cout << endl;
+      if (cin.fail() || numOfChips <= 0) {
+         cin.clear();
+         cin.ignore(numeric_limits<streamsize>::max(), '\n');
+         cout << "INVALID NUMBER OF CHIPS, please try again." << endl;
+      }
+   }
+   
+   return numOfChips;
+}
+
+int SlotNum(int slot = 0) {
+   
+   cout << "Which slot do you want to drop the chip(s) in (0-8)? ";
+   cin >> slot;
+   cout << endl;
+   while ((cin.fail()) || (slot < MIN_COLUMN) || (slot > MAX_COLUMN)) {
+      cin.clear();
+      cin.ignore(numeric_limits<streamsize>::max(), '\n');
+      cout << "INVALID SLOT, please try again." << endl;
+      cout << "Which slot do you want to drop the chip(s) in (0-8)? ";
+      cin >> slot;
+      cout << endl;
+   }
+   
+   return slot;
+}
+
+int MenuChoice(int userChoice) {
+   
+   cout << "MENU: Please select one of the following options:" << endl << endl;
+   cout << "0 - Quit the program" << endl;
+   cout << "1 - Drop a single chip into one slot" << endl;
+   cout << "2 - Drop multiple chips into one slot" << endl;
+   cout << "3 - Drop multiple chips into each slot" << endl << endl;
+   cout << "Enter your selection now: ";
+   cin >> userChoice;
+   cout << endl;
+   while (userChoice != SINGLE_OPTION && userChoice != MULTIPLE_ONE_SLOT_OPTION &&
+          userChoice != MULTIPLE_ALL_SLOTS_OPTION && (userChoice != EXIT_OPTION || cin.fail())) {
+      cin.clear();
+      cin.ignore(numeric_limits<streamsize>::max(), '\n');
+      cout << "INVALID SELECTION.  Please enter 0, 1, 2 or 3" << endl;
+      cout << "Enter your selection now: ";
+      cin >> userChoice;
+      cout << endl;
+   }
+   
+   return userChoice;
+}
+
+int main() {
+   
+   srand(RANDOM_SEED);
+   
+   int userMenuChoice = 0;
+   int userMultipleChips = 0;
+   int startingColumn = 0;
+   int currentColumn = 0;
+   const int SET_PRECISION = 1;
+   
+   cout << "Welcome to the plinko simulator!" << endl << endl;
+   cout << fixed << setprecision(SET_PRECISION);
+   
+   do {
+      
+      userMenuChoice = MenuChoice(userMenuChoice);
+      
+      if (userMenuChoice == SINGLE_OPTION) {
+         cout << "*** DROP SINGLE CHIP ***" << endl << endl;
+         startingColumn = SlotNum();
+         currentColumn = startingColumn;
+         DropSingleChip(currentColumn);
+      }
+      else if (userMenuChoice == MULTIPLE_ONE_SLOT_OPTION) {
+         cout << "*** DROP MULTIPLE CHIPS ***" << endl << endl;
+         userMultipleChips = DropNumOfChips();
+         startingColumn = SlotNum();
+         DropMultipleChips(startingColumn, userMultipleChips, userMenuChoice);
+      }
+      else if (userMenuChoice == MULTIPLE_ALL_SLOTS_OPTION) {
+         userMultipleChips = DropNumOfChips();
+         cout << "*** SEQUENTIALLY DROP MULTIPLE CHIPS ***" << endl << endl;
+         for (int slot = 0; slot <= MAX_COLUMN; ++slot) {
+            startingColumn = slot;
+            DropMultipleChips(startingColumn, userMultipleChips, userMenuChoice);
+         }
+         cout << endl;
+      }
+      
+   } while ((userMenuChoice != EXIT_OPTION));
+   
+   cout << "GOODBYE!";
+   
+   return 0;
+}

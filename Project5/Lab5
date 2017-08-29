@@ -1,0 +1,181 @@
+/*
+ Jonathan Armknecht, Section 7, jonathan.armknecht@gmail.com
+ Purpose: To compute the steady state temperature on the surface of a hot plate
+ Inputs: No inputs needed
+ Outputs:
+   Prints out a 20 x 20 plate with initial temperatures
+   Prints out a 20 x 20 plate with the temperatures changing once
+   Prints out a 20 x 20 plate with the final of all temperatures not changing more than 0.1 degrees
+   Prints out the final plate to go into Excel
+ Test Cases
+   Case 1
+      Printed out a 5 X 5 plate
+      Expected Outputs:
+         Printing initial plate...
+            0.0000,  100.0000,  100.0000,  100.0000,    0.0000
+            0.0000,    0.0000,    0.0000,    0.0000,    0.0000
+            0.0000,    0.0000,    0.0000,    0.0000,    0.0000
+            0.0000,    0.0000,    0.0000,    0.0000,    0.0000
+            0.0000,  100.0000,  100.0000,  100.0000,    0.0000
+         Printing plate after one iteration...
+            0.0000,  100.0000,  100.0000,  100.0000,    0.0000
+            0.0000,   25.0000,   25.0000,   25.0000,    0.0000
+            0.0000,    0.0000,    0.0000,    0.0000,    0.0000
+            0.0000,   25.0000,   25.0000,   25.0000,    0.0000
+            0.0000,  100.0000,  100.0000,  100.0000,    0.0000
+         Printing final plate...
+            0.0000,  100.0000,  100.0000,  100.0000,    0.0000
+            0.0000,   49.8535,   62.3047,   49.8535,    0.0000
+            0.0000,   37.3047,   49.7070,   37.3047,    0.0000
+            0.0000,   49.8535,   62.3047,   49.8535,    0.0000
+            0.0000,  100.0000,  100.0000,  100.0000,    0.0000
+         Printing final plate for excel...
+            0.0000    100.0000    100.0000    100.0000    0.0000
+            0.0000    49.8535 62.3047 49.8535 0.0000
+            0.0000    37.3047 49.7070 37.3047 0.0000
+            0.0000    49.8535 62.3047 49.8535 0.0000
+            0.0000    100.0000    100.0000    100.0000    0.0000
+      All outputs were as expected
+   Case 2
+      Change the NUM_ROWS and NUM_COLS constants to 20 to make a 20 x 20
+      plate and saw if my code was coded to work with any size plate
+      All outputs were as expected as graded by zyBooks (since it was 20 x 20 I
+      didn't want to paste it here since it would be longer than 100 chars)
+ */
+
+#include <iostream>
+#include <iomanip>
+
+using namespace std;
+
+int main() {
+   
+   const int NUM_ROWS = 20;
+   const int NUM_COLS = 20;
+   const int FIRST_COL = 0;
+   const int LAST_COL = NUM_COLS - 1;
+   const int FIRST_ROW = 0;
+   const int LAST_ROW = NUM_ROWS - 1;
+   const double CORNER_ELEMENTS = 0.0000;
+   const double MIDDLE_ELEMENTS = 0.0000;
+   const double TOP_BOTTOM_ELEMENTS = 100.0000;
+   const double AVG_DIVISOR = 4.0;
+   
+   double previousHotPlateArray[NUM_ROWS][NUM_COLS];
+   double newHotPlateArray[NUM_ROWS][NUM_COLS];
+   double changeInTemp = 0.0;
+   double largestChangeInTemp = 0.0;
+   
+   cout << fixed << setprecision(4);
+   
+   cout << "Hotplate simulator" << endl << endl;
+   
+   for (int i = 0; i < NUM_ROWS; ++i) {
+      for (int j = 0; j < NUM_COLS; ++j) {
+         if ((i == FIRST_ROW && j == FIRST_COL) ||
+             (i == FIRST_ROW && j == LAST_COL) || (i == LAST_ROW && j == FIRST_COL) ||
+             (i == LAST_ROW && j == LAST_COL)) {
+            previousHotPlateArray[i][j] = CORNER_ELEMENTS;
+         }
+         else if ((i == FIRST_ROW && j > FIRST_COL && j < LAST_COL) ||
+                  (i == LAST_ROW && j > FIRST_COL && j < LAST_COL)) {
+            previousHotPlateArray[i][j] = TOP_BOTTOM_ELEMENTS;
+         }
+         else {
+            previousHotPlateArray[i][j] = MIDDLE_ELEMENTS;
+         }
+      }
+   }
+   
+   cout << "Printing initial plate..." << endl;
+   for (int i = 0; i < NUM_ROWS; ++i) {
+      for (int j = 0; j < NUM_COLS; ++j) {
+         cout << setw(10) << previousHotPlateArray[i][j];
+         if (j == LAST_COL) {
+            cout << endl;
+         }
+         else {
+            cout << ",";
+         }
+      }
+   }
+   cout << endl;
+   
+   cout << "Printing plate after one iteration..." << endl;
+   for (int i = 0; i < NUM_ROWS; ++i) {
+      for (int j = 0; j < NUM_COLS; ++j) {
+         if ((i > FIRST_ROW && i < LAST_ROW) && (j > FIRST_COL && j < LAST_COL)) {
+            newHotPlateArray[i][j] = (previousHotPlateArray[i - 1][j] + previousHotPlateArray[i][j + 1] +
+                                      previousHotPlateArray[i + 1][j] + previousHotPlateArray[i][j - 1]) / AVG_DIVISOR;
+         }
+         else {
+            newHotPlateArray[i][j] = previousHotPlateArray[i][j];
+         }
+         cout << setw(10) << newHotPlateArray[i][j];
+         if (j == LAST_COL) {
+            cout << endl;
+         }
+         else {
+            cout << ",";
+         }
+      }
+   }
+
+   do {
+      
+      largestChangeInTemp = 0.0;
+      
+      for (int i = 0; i < NUM_ROWS; ++i) {
+         for (int j = 0; j < NUM_COLS; ++j) {
+            previousHotPlateArray[i][j] = newHotPlateArray[i][j];
+         }
+      }
+      
+      for (int i = 0; i < NUM_ROWS; ++i) {
+         for (int j = 0; j < NUM_COLS; ++j) {
+            if ((i > FIRST_ROW && i < LAST_ROW) && (j > FIRST_COL && j < LAST_COL)) {
+               newHotPlateArray[i][j] = (previousHotPlateArray[i - 1][j] + previousHotPlateArray[i][j + 1] +
+                                         previousHotPlateArray[i + 1][j] + previousHotPlateArray[i][j - 1]) / AVG_DIVISOR;
+               changeInTemp = newHotPlateArray[i][j] - previousHotPlateArray[i][j];
+               if (changeInTemp > 0.1) {
+                  largestChangeInTemp = changeInTemp;
+               }
+            }
+            else {
+               newHotPlateArray[i][j] = previousHotPlateArray[i][j];
+            }
+         }
+      }
+      
+   } while (largestChangeInTemp > 0.1);
+   cout << endl;
+
+   cout << "Printing final plate..." << endl;
+   for (int i = 0; i < NUM_ROWS; ++i) {
+      for (int j = 0; j < NUM_COLS; ++j) {
+         cout << setw(10) << newHotPlateArray[i][j];
+         if (j == LAST_COL) {
+            cout << endl;
+         }
+         else {
+            cout << ",";
+         }
+      }
+   }
+   cout << endl;
+   
+   cout << "Printing final plate for excel..." << endl;
+   for (int i = 0; i < NUM_ROWS; ++i) {
+      for (int j = 0; j < NUM_COLS; ++j) {
+         cout << newHotPlateArray[i][j];
+         if (j == LAST_COL) {
+            cout << endl;
+         }
+         else {
+            cout << "\t";
+         }
+      }
+   }
+   
+   return 0;
+}

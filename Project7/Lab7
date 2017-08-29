@@ -1,0 +1,350 @@
+/*
+ Jonathan Armknecht, Section 7, jonathan.armknecht@gmail.com
+ Purpose: To make the choice of where to eat easier to make, and more fun in the process
+ Inputs:
+   Menu Choice
+   Name of restaurant to add or remove
+   Where to cut the vector
+   1 or 2 to choose restaurant that continues in the tournament
+ Outputs:
+   Welcomes the user
+   Prompts to select a menu option, if incorrect prints INVALID SELECTION and re-prompts
+   Prints restuarant list
+   Prompts for name to add. Prints if the restaurant was added to the list, if already on the list
+      tells user it is already in the list
+   Prompts for name to delete. Prints if the restaurant was deleted from the list, if not on the 
+      list tells user it isn't on the list
+   Prompts for a number of where the vector deck should be cut if out of range says
+      deck cannot be cut there
+   Prints an error if user tries to shuffle deck or start tournament if the size of the vector
+      is not equal to a power of 2. Tells user to add or delete a restaurant
+   Prints the round of the tournament and the choices of restaurants that user chooses to move on
+   Prints out the winner of the tournament
+   Prints out GOODBYE at the end of the program
+ 
+ Test Case 1: Testing Incorrect inputs, and deleted menu option
+   Inputs: The following is are inputs that test the possible incorrect input situations
+      7, -1, 2, Cafe Rio, 2, Cafe Rio, 2, Taco Bell, 3, Del Taco, 2, Del Taco, 5, 6, 3, 
+      Del Taco, 4, 3, 0
+   Outputs:
+      7, -1 print that they are invalid and reprompts for a menu option
+      Prints the restuarant added if not in list
+      Trying to add Cafe Rio again prints its already on the list
+      Trying to delelte Del Taco prints it is not on the list so it can't be deleted
+      5, 6 prints error that the vector isn't a power of 2
+      Deletes Del Taco from vector
+      Prints that the deck cannot be cut there due to it being an incorrect input
+      Prints Goodbye
+ 
+ Test Case 2: Testing if other menu options work
+   Inputs: 2, Cafe Rio, 2, Taco Bell, 2, Del Taco, 2, Costa Vida, 1, 4, 2, 1, 5, 1, 6, 1, 2, 1, 0
+   Expected Outputs:
+      Prints Cafe Rio, Taco Bell, Del Taco, Costa Vida
+      Asks where deck should be cut
+      Prints Del Taco, Costa Vida, Cafe Rio, Taco Bell
+      Prints Cafe Rio, Del Taco, Taco Bell, Costa Vida
+      Prints round of the tournament
+      Asks to choose between Cafe Rio and Del Taco
+      Asks to choose between Taco Bell and Costa Vida
+      Prints round
+      Asks to choose between Cafe Rio and Costa Vida
+      Prints Cafe Rio as the winner
+      Prints Goodbye
+   All outputs were as expected
+ 
+ Test Case 3: Testing if a vector of 8 works just as the vector of 4 above did
+   Inputs: 2, Cafe Rio, 2, Taco Bell, 2, Del Taco, 2, Costa Vida, 2, JCW's, 2, Wendy's, 2, McDonald's,
+      2, Burger King, 1, 4, 2, 1, 5, 1, 6, 1, 2, 2, 2, 2, 1, 2, 0
+   Expected Outputs:
+      The print function will print a vector with 8 elements
+      Here is the expected cut and shuffled vector:
+         "McDonald's"
+         "Del Taco"
+         "Burger King"
+         "Costa Vida"
+         "Cafe Rio"
+         "JCW's"
+         "Taco Bell"
+         "Wendy's"
+      Prints JCW's as the winner
+      Prints Goodbye
+   All outputs were as expected
+*/
+#include <iostream>
+#include <vector>
+#include <string>
+#include <limits>
+#include <cmath>
+using namespace std;
+
+const int QUIT_OPTION = 0;
+const int DISPLAY_OPTION = 1;
+const int ADD_OPTION = 2;
+const int REMOVE_OPTION = 3;
+const int CUT_LIST_OPTION = 4;
+const int SHUFFLE_LIST_OPTION = 5;
+const int BEGIN_TOURNAMENT_OPTION = 6;
+
+int MenuChoice(int userChoice) {
+   
+   bool goodInput = false;
+   
+   while (!goodInput) {
+      cout << "Please select one of the following options:" << endl << endl;
+      cout << QUIT_OPTION << " - Quit the program" << endl;
+      cout << DISPLAY_OPTION << " - Display all restaurants" << endl;
+      cout << ADD_OPTION << " - Add a restaurant" << endl;
+      cout << REMOVE_OPTION <<" - Remove a restaurant" << endl;
+      cout << CUT_LIST_OPTION << " - \"Cut\" the list of restaurants" << endl;
+      cout << SHUFFLE_LIST_OPTION << " - \"Shuffle\" the list of restaurants" << endl;
+      cout << BEGIN_TOURNAMENT_OPTION << " - Begin the tournament" << endl << endl;
+      cout << "Enter your selection now: ";
+      cin >> userChoice;
+      cout << endl;
+      if (userChoice >= QUIT_OPTION && userChoice <= BEGIN_TOURNAMENT_OPTION) {
+         goodInput = true;
+      }
+      else {
+         cout << "INVALID SELECTION.  Please try again." << endl << endl;
+      }
+   }
+   
+   return userChoice;
+}
+
+bool FindRestaurant(const vector<string>& userRestaurants, const string& restaurantName) {
+   
+   bool foundRestaurant = false;
+   
+   for (int i = 0; i < userRestaurants.size(); ++i) {
+      if (userRestaurants.at(i) == restaurantName) {
+         foundRestaurant = true;
+      }
+   }
+   
+   return foundRestaurant;
+}
+
+void PrintRestaurants(const vector<string>& userRestaurants) {
+   
+   for (int i = 0; i < userRestaurants.size(); ++i) {
+      cout << "\t" << "\"" << userRestaurants.at(i) << "\"" << endl;
+   }
+   
+}
+
+void AddRestaurant(vector<string>& userRestaurants, string restaurantName, bool restaurantFound = false) {
+   
+   restaurantFound = FindRestaurant(userRestaurants, restaurantName);
+   if (!restaurantFound) {
+      userRestaurants.push_back(restaurantName);
+      cout << restaurantName << " has been added." << endl << endl;
+   }
+   else {
+      cout << "That restaurant is already on the list, you can not add it again." << endl << endl;
+   }
+   
+}
+
+void DeleteRestaurant(vector<string>& userRestaurants, string restaurantName, bool restaurantFound = false) {
+   
+   restaurantFound = FindRestaurant(userRestaurants, restaurantName);
+   if (restaurantFound) {
+      for (int i = 0; i < userRestaurants.size(); ++i) {
+         if (userRestaurants.at(i) == restaurantName) {
+            userRestaurants.erase(userRestaurants.begin() + i);
+         }
+      }
+      cout << restaurantName << " has been removed." << endl << endl;
+   }
+   else {
+      cout << "That restaurant is not on the list, you can not remove it." << endl << endl;
+   }
+   
+}
+
+vector<string> CutRestaurants(vector<string> userRestaurants, int whereToCut) {
+   
+   vector<string> cutRestaurants = userRestaurants;
+   string tempString;
+   bool keepCutting = true;
+   const int VECTOR_INDEX = 0;
+   int numOfCuts = 0;
+   
+   if (whereToCut != 0 && whereToCut <= userRestaurants.size()) {
+      while (keepCutting) {
+         tempString = cutRestaurants.at(VECTOR_INDEX);
+         cutRestaurants.push_back(tempString);
+         cutRestaurants.erase(cutRestaurants.begin() + VECTOR_INDEX);
+         ++numOfCuts;
+         if (numOfCuts == whereToCut) {
+            keepCutting = false;
+         }
+      }
+   }
+   else {
+      cout << "The restaurants can not be cut there, there are only " << userRestaurants.size() <<
+      " restaurants in the list." << endl << endl;
+   }
+   
+   return cutRestaurants;
+}
+
+void ShuffleRestaurants2(vector<string>& userRestaurants) {
+   
+   vector<string> shuffleRestaurants2;
+   unsigned long middleRestaurantIndex = userRestaurants.size() / 2;
+   
+   for (int i = 0; i < middleRestaurantIndex; ++i) {
+      shuffleRestaurants2.push_back(userRestaurants.at(i + middleRestaurantIndex));
+      shuffleRestaurants2.push_back(userRestaurants.at(i));
+   }
+
+   userRestaurants = shuffleRestaurants2;
+   
+}
+
+bool CheckSize(const vector<string>& userRestaurants) {
+   
+   bool correctSize = false;
+   unsigned long sizeOfList = userRestaurants.size();
+   int powerBaseAnswer = 0;
+   const int POWER_BASE_NUM = 2;
+   
+   for (int i = 0; i < numeric_limits<int>::max(); ++i) {
+      powerBaseAnswer = pow(POWER_BASE_NUM, i);
+      if (sizeOfList == powerBaseAnswer) {
+         correctSize = true;
+         return correctSize;
+      }
+      else if (powerBaseAnswer > sizeOfList) {
+         return correctSize;
+      }
+   }
+   
+   return correctSize;
+}
+
+void EraseBracket(vector<string>& userRestaurants) {
+   
+   const int INDEX_OF_VECTOR = 0;
+   const int INCREMENT_INDEX = INDEX_OF_VECTOR + 1;
+   
+   userRestaurants.erase(userRestaurants.begin() + (INCREMENT_INDEX));
+   userRestaurants.erase(userRestaurants.begin() + INDEX_OF_VECTOR);
+   
+}
+
+void BeginTournament(vector<string>& userRestaurants) {
+   
+   bool keepTournamentGoing = true;
+   int userChoice = 1;
+   int numOfRounds = 1;
+   const int INDEX_OF_VECTOR = 0;
+   const int INCREMENT_INDEX = INDEX_OF_VECTOR + 1;
+   const int TOP_CHOICE_IN_BRACKET = 1;
+   const int BOTTOM_CHOICE_IN_BRACKET = 2;
+   const int TOURNAMENT_FINALIST = 1;
+   
+   while (keepTournamentGoing) {
+      if (CheckSize(userRestaurants) && (userChoice == TOP_CHOICE_IN_BRACKET ||
+          userChoice == BOTTOM_CHOICE_IN_BRACKET)) {
+         cout << "Round: " << numOfRounds << endl << endl;
+         ++numOfRounds;
+      }
+      
+      cout << "Type \"" << TOP_CHOICE_IN_BRACKET << "\" if you prefer " <<
+      userRestaurants.at(INDEX_OF_VECTOR) << " or" << endl;
+      cout << "type \"" << BOTTOM_CHOICE_IN_BRACKET << "\" if you prefer " <<
+      userRestaurants.at(INCREMENT_INDEX) << endl;
+      cout << "Choice: ";
+      cin >> userChoice;
+      cout << endl;
+      if (userChoice == TOP_CHOICE_IN_BRACKET) {
+         userRestaurants.push_back(userRestaurants.at(INDEX_OF_VECTOR));
+         EraseBracket(userRestaurants);
+      }
+      else if (userChoice == BOTTOM_CHOICE_IN_BRACKET) {
+         userRestaurants.push_back(userRestaurants.at(INCREMENT_INDEX));
+         EraseBracket(userRestaurants);
+      }
+         
+      if (userRestaurants.size() == TOURNAMENT_FINALIST) {
+         keepTournamentGoing = false;
+      }
+   }
+   cout << "The winning restaurant is " << userRestaurants.at(INDEX_OF_VECTOR) << endl;
+   
+}
+
+int main() {
+   
+   int menuChoice = 0;
+   int userCutChoice = 0;
+   bool rightSizedVector = false;
+   string entrRestaurtant;
+   vector<string> userRestaurants;
+   
+   cout << "Welcome to the restaurant battle!" << endl << endl << endl;
+   
+   do {
+      menuChoice = MenuChoice(menuChoice);
+      
+      if (menuChoice == DISPLAY_OPTION) {
+         cout << "Here are the current restaurants:" << endl << endl;
+         PrintRestaurants(userRestaurants);
+         cout << endl;
+      }
+      else if (menuChoice == ADD_OPTION) {
+         cin.ignore(numeric_limits<streamsize>::max(), '\n');
+         cout << "What is the name of the restaurant you want to add? ";
+         getline(cin, entrRestaurtant);
+         cout << endl;
+         AddRestaurant(userRestaurants, entrRestaurtant);
+      }
+      else if (menuChoice == REMOVE_OPTION) {
+         cin.ignore(numeric_limits<streamsize>::max(), '\n');
+         cout << "What is the name of the restaurant you want to remove? ";
+         getline(cin, entrRestaurtant);
+         cout << endl;
+         DeleteRestaurant(userRestaurants, entrRestaurtant);
+      }
+      else if (menuChoice == CUT_LIST_OPTION) {
+         cout << "How many restaurants should be taken from the top and put on the bottom? ";
+         cin >> userCutChoice;
+         cout << endl << endl;
+         userRestaurants = CutRestaurants(userRestaurants, userCutChoice);
+      }
+      else if (menuChoice == SHUFFLE_LIST_OPTION) {
+         rightSizedVector = CheckSize(userRestaurants);
+         if (!rightSizedVector) {
+            cout << "The current tournament size (" << userRestaurants.size() <<
+            ") is not a power of two (2, 4, 8...)." << endl;
+            cout << "A shuffle is not possible. Please add or remove resturants." << endl << endl;
+         }
+         else {
+            ShuffleRestaurants2(userRestaurants);
+            cout << endl;
+         }
+      }
+      
+      else if (menuChoice == BEGIN_TOURNAMENT_OPTION) {
+         rightSizedVector = CheckSize(userRestaurants);
+         if (!rightSizedVector) {
+            cout << "The current tournament size (" << userRestaurants.size() <<
+            ") is not a power of two (2, 4, 8...)." << endl;
+            cout << "A tournament is not possible. Please add or remove resturants." << endl << endl;
+         }
+         else {
+            BeginTournament(userRestaurants);
+            cout << endl;
+         }
+      }
+      
+      
+   } while (menuChoice != QUIT_OPTION);
+   
+   cout << "GOODBYE!";
+   
+   return 0;
+}

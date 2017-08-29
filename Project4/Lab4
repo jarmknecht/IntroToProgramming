@@ -1,0 +1,300 @@
+/* Jonathan Armknecht, Section 7, jonathan.armknecht@gmail.com
+Purpose: To write a plinko program to practice for the Price Is Right show
+Inputs:
+   0- Exits program
+   1- Enters Single Chip menu for drop
+      0-8: Choices for which slot to drop chip in
+   2- Enters Multiple Chip menu for drop
+      Number > 0: User inputs number of chips they want to drop
+         0-8: Choices for which slot to drop chips in
+Outputs:
+  Welcomes user and prompts the user to enter in 0, 1 or 2 to start program
+      If 0 is chosen:
+         Prints out GOODBYE!
+      If 1 is chosen:
+         Prints out *** DROP SINGLE CHIP ***
+         Prompts user to enter in a number between 0-8 for which slot it will be dropped into
+            If user choses a number outside of this range prints out INVALID SLOT. and returns to menu
+         Prints out which slot the user selected
+         Prints out the path that the chip took to the bottom
+         Prints out money won
+      If 2 is chosen:
+         Prints out *** DROP MULTIPLE CHIPS ***
+         Prompts user to enter a number > 0 for how many chips they want to drop
+            If user enters a number out of the range prints out INVALID NUMBER OF CHIPS. and returns to menu
+         Prompts user to enter in a number between 0-8 for which slot chips will be dropped into
+            If user choses a number outside of this range prints out INVALID SLOT. and returns to menu
+         Prints out the total amount of winnings for all chips
+         Prints out the average amount of money won per chip
+      If no options are chosen:
+         Prints out INVALID SELECTION.  Please enter 0, 1 or 2 returns to menu
+Test Cases:
+   Case 1:
+      Inputs:
+         1
+         -1
+         1
+         8
+         0
+      Expected Outputs:
+         *** DROP SINGLE CHIP ***
+         INVALID SLOT. Redirects back to menu
+         *** DROP SINGLE CHIP ***
+         *** DROPPING CHIP INTO SLOT 8 ***
+         PATH: [8.0 7.5 7.0 7.5 8.0 7.5 7.0 7.5 7.0 7.5 8.0 7.5 8.0] 
+            (Ran once already so expected, also numbers stayed in the bounds of the board)
+         WINNINGS: $100.00
+            (Ran once already so expected)
+         GOODBYE!
+      Outputs:
+         All outputs were as expected even the path and winnings since rand() was seeded with 42
+   Case 2:
+      Inputs:
+         2
+         -10
+         2
+         777
+         300
+         2
+         777
+         3
+         0
+      Expected Outputs:
+         *** DROP MULTIPLE CHIPS ***
+         INVALID NUMBER OF CHIPS. Redirects back to menu
+         *** DROP MULTIPLE CHIPS ***
+         INVALID SLOT. Redirects back to menu
+         *** DROP MULTIPLE CHIPS ***
+         Total Winnings: 1759100.00
+            (Ran once already so expected)
+         Average Winnings: 2263.96
+            (Ran once already so expected)
+         GOODBYE!
+      Outputs:
+         All outputs were as expected even the total winnings and average winnings since rand() was seeded with 42
+   Case 3:
+      Inputs:
+         3
+         0
+      Expected Outputs:
+         INVALID SELECTION.  Please enter 0, 1 or 2. Redirects back to menu
+         GOODBYE!
+      Outputs:
+         All outputs were as expected
+*/
+
+#include <iostream>
+#include <cstdlib>
+#include <iomanip>
+
+using namespace std;
+
+int main() {
+	
+	srand(42);
+
+	const int PLINKO_ROWS = 12;
+	const int ONE_LESS_ROW = PLINKO_ROWS - 1;
+	const int EXIT_OPTION = 0;
+	const int SINGLE_OPTION = 1;
+	const int MULTIPLE_OPTION = 2;
+	const int MIN_COLUMN = 0;
+	const int COLUMN_ONE = 1;
+	const int COLUMN_TWO = 2;
+	const int COLUMN_THREE = 3;
+	const int COLUMN_FOUR = 4;
+	const int COLUMN_FIVE = 5;
+	const int COLUMN_SIX = 6;
+	const int COLUMN_SEVEN = 7;
+	const int MAX_COLUMN = 8;
+	const int RAND_MODULO = 2;
+	const double MOVING_LEFT_OR_RIGHT = 0.5;
+	const double WALL_HIT = 1.0;
+	const double SLOT_0_AND_8_WINNINGS = 100.0;
+	const double SLOT_1_AND_7_WINNINGS = 500.0;
+	const double SLOT_2_AND_6_WINNINGS = 1000.0;
+	const double SLOT_3_AND_5_WINNINGS = 0.00;
+	const double SLOT_4_WINNINGS = 10000.0;
+
+	int userMenuChoice = 0;
+	int userMultipleChips = 0;
+	double startingColumn = 0.0;
+	double currentColumn = 0.0;
+	double moveDirection = 0.0;
+	double multipleChipWinnings = 0.0;
+	double avgChipWinnings = 0.0;
+
+	cout << "Welcome to the plinko simulator!" << endl << endl;
+
+	do {
+		
+		cout << fixed << setprecision(1);
+
+		cout << "MENU: Please select one of the following options:" << endl << endl;
+		cout << "0 - Quit the program" << endl;
+		cout << "1 - Drop a single chip into one slot" << endl;
+		cout << "2 - Drop multiple chips into one slot" << endl << endl;
+		cout << "Enter your selection now: ";
+		cin >> userMenuChoice;
+		cout << endl;
+
+		if (userMenuChoice == EXIT_OPTION) {
+			break;
+		}
+		
+		else if (userMenuChoice == SINGLE_OPTION) {
+			startingColumn = 0.0;
+			
+			while ((startingColumn >= MIN_COLUMN) && (startingColumn <= MAX_COLUMN)) {
+				cout << "*** DROP SINGLE CHIP ***" << endl << endl;
+				cout << "Which slot do you want to drop the chip in (0-8)? ";
+				cin >> startingColumn;
+				cout << endl;
+				
+				if ((startingColumn >= MIN_COLUMN && startingColumn <= MAX_COLUMN)) {
+					cout << "*** DROPPING CHIP INTO SLOT " << static_cast<int> (startingColumn)
+					<< " ***" << endl;
+					cout << "PATH: [" << startingColumn << " ";
+					currentColumn = startingColumn;
+					for (int i = 0; i < PLINKO_ROWS; ++i) {
+						moveDirection = rand() % RAND_MODULO;
+						if (moveDirection == 0) {
+							currentColumn = currentColumn - MOVING_LEFT_OR_RIGHT;
+						}
+						else {
+							currentColumn = currentColumn + MOVING_LEFT_OR_RIGHT;
+						}
+						
+						if (currentColumn > MAX_COLUMN) {
+							currentColumn = currentColumn - WALL_HIT;
+						}
+						
+						if (currentColumn < MIN_COLUMN) {
+							currentColumn = currentColumn + WALL_HIT;
+						}
+						
+						if (i == ONE_LESS_ROW) {
+							cout << currentColumn << "]" << endl;
+						}
+						else {
+							cout << currentColumn << " ";
+						}
+					}
+					
+					cout << "WINNINGS: $";
+					cout << fixed << setprecision(2);
+					
+					if ((currentColumn == MIN_COLUMN) || (currentColumn == MAX_COLUMN)) {
+						cout << SLOT_0_AND_8_WINNINGS << endl;
+					}
+					
+					if ((currentColumn == COLUMN_ONE) || (currentColumn == COLUMN_SEVEN)) {
+						cout << SLOT_1_AND_7_WINNINGS << endl;
+					}
+					
+					if ((currentColumn == COLUMN_TWO) || (currentColumn == COLUMN_SIX)) {
+						cout << SLOT_2_AND_6_WINNINGS << endl;
+					}
+					
+					if ((currentColumn == COLUMN_THREE) || (currentColumn == COLUMN_FIVE)) {
+						cout << SLOT_3_AND_5_WINNINGS << endl;
+					}
+					
+					if (currentColumn == COLUMN_FOUR) {
+						cout << SLOT_4_WINNINGS << endl;
+					}
+				}
+				else {
+					cout << "INVALID SLOT." << endl;
+				}
+				break;
+			}
+			cout << endl;
+		}
+		
+		else if (userMenuChoice == MULTIPLE_OPTION) {
+			startingColumn = 0.0;
+			multipleChipWinnings = 0.0;
+			
+			while ((startingColumn >= MIN_COLUMN) && (startingColumn <= MAX_COLUMN)) {
+				cout << "*** DROP MULTIPLE CHIPS ***" << endl << endl;
+				cout << "How many chips do you want to drop (>0)? ";
+				cin >> userMultipleChips;
+				cout << endl;
+				
+				if (userMultipleChips <= 0) {
+					cout << "INVALID NUMBER OF CHIPS." << endl << endl;
+					break;
+				}
+				
+				cout << "Which slot do you want to drop the chip in (0-8)? ";
+				cin >> startingColumn;
+				cout << endl;
+				
+				if ((startingColumn >= MIN_COLUMN && startingColumn <= MAX_COLUMN)) {
+					for (int i = 0; i < userMultipleChips; ++i) {
+					   currentColumn = startingColumn;
+					   for (int j = 0; j < PLINKO_ROWS; ++j) {
+						   moveDirection = rand() % RAND_MODULO;
+						   if (moveDirection == 0) {
+							   currentColumn = currentColumn - MOVING_LEFT_OR_RIGHT;
+						   }
+						   else {
+							   currentColumn = currentColumn + MOVING_LEFT_OR_RIGHT;
+						   }
+						   
+						   if (currentColumn > MAX_COLUMN) {
+							   currentColumn = currentColumn - WALL_HIT;
+						   }
+						   
+						   if (currentColumn < MIN_COLUMN) {
+							   currentColumn = currentColumn + WALL_HIT;
+						   }   
+					   }
+					
+						cout << fixed << setprecision(2);
+						
+						if ((currentColumn == MIN_COLUMN) || (currentColumn == MAX_COLUMN)) {
+						   multipleChipWinnings = SLOT_0_AND_8_WINNINGS + multipleChipWinnings;
+						}
+						
+						if ((currentColumn == COLUMN_ONE) || (currentColumn == COLUMN_SEVEN)) {
+						   multipleChipWinnings = SLOT_1_AND_7_WINNINGS + multipleChipWinnings;
+					   }
+					   
+						if ((currentColumn == COLUMN_TWO) || (currentColumn == COLUMN_SIX)) {
+					  	   multipleChipWinnings = SLOT_2_AND_6_WINNINGS + multipleChipWinnings;
+						}
+						
+						if ((currentColumn == COLUMN_THREE) || (currentColumn == COLUMN_FIVE)) {
+						   multipleChipWinnings = SLOT_3_AND_5_WINNINGS + multipleChipWinnings;
+						}
+						
+						if (currentColumn == COLUMN_FOUR) {
+						   multipleChipWinnings = SLOT_4_WINNINGS + multipleChipWinnings;
+						}
+					}
+					cout << "Total Winnings on " << userMultipleChips << " chips: "
+					<< multipleChipWinnings << endl;
+					
+					avgChipWinnings = multipleChipWinnings / userMultipleChips;
+					cout << "Average winnings per chip: " << avgChipWinnings << endl << endl;
+				}
+				else {
+					cout << "INVALID SLOT." << endl << endl;
+				}
+				break;
+			}
+		}
+		
+		else {
+			cout << "INVALID SELECTION.  Please enter 0, 1 or 2" << endl << endl;
+		}
+	
+	} while ((userMenuChoice != EXIT_OPTION) || (userMenuChoice != SINGLE_OPTION)
+	  || (userMenuChoice != MULTIPLE_OPTION));
+	
+	cout << "GOODBYE!";
+
+	return 0;
+}

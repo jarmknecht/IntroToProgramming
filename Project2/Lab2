@@ -1,0 +1,125 @@
+/* Jonathan Armknecht, Section 7, jonathan.armknecht@gmail.com
+Purpose: Determine how many pizzas, of diffent sizes, that need to be ordered for BYUSA event
+Inputs: 
+   Amount of guests attending the event
+   Amount that is tipped
+Outputs: 
+   Amount and sizes of pizzas needed to buy 
+   Total area of pizzas for event
+   Area of pizza per guest eaten
+   Total cost including tip
+Test Cases:
+Test 1: 
+   Input: 
+      781 guests
+      12% tip
+   Output: 
+      111 large pizzas, 1 medium pizza, and 1 small pizza
+      35185.8 square inches of pizza, 45.0523 square inches per guest
+      Total Cost = $1846 
+Test 2: 
+   Input: 
+      386 guests
+      23% tip
+   Output:
+      55 large pizzas, 0 medium pizzas, 1 small pizza
+      17391.8 square inches of pizza, 45.0566 square inches per guest
+      Total Cost = $1002
+Test 3: 
+   Input: 
+      154673 guests
+      10% tip
+   Output:
+      22096 large pizzas, 0 medium pizzas, 1 small pizza
+      6.94177e+06 square inches of pizza, 44.8803 square inches per guest
+      Total Cost = $356814
+*/
+
+#include <iostream>
+#include <cmath>
+using namespace std;
+
+int main () {
+   
+   const double COST_OF_LARGE_PIZZA = 14.68;
+   const double COST_OF_MEDIUM_PIZZA = 11.48;
+   const double COST_OF_SMALL_PIZZA = 7.28;
+   const double ROUND_NUM = 0.5;
+   const double PI = 3.14159;
+   const int DIAMETER_DIVISOR = 2;
+   const int TIP_DIVISOR = 100;
+   const int POWER_SQUARED = 2;
+   const int DIAMETER_OF_LARGE_PIZZA = 20;
+   const int DIAMETER_OF_MEDIUM_PIZZA = 16;
+   const int DIAMETER_OF_SMALL_PIZZA = 12;
+   const int LARGE_PIZZA_FEEDS = 7;
+   const int MEDIUM_PIZZA_FEEDS = 3;
+   const int SMALL_PIZZA_FEEDS = 1;
+   
+   int numOfGuests = 0;
+   int numOfLargePizzas = 0;
+   int numOfMediumPizzas = 0;
+   int leftoverPeopleAfterLarge = 0;
+   int leftoverPeopleAfterMedium = 0;
+   int numOfSmallPizzas = 0;
+   int radiusOfLargePizza = 0;
+   int radiusOfMediumPizza = 0;
+   int radiusOfSmallPizza = 0;
+   int roundedCostValue = 0;
+   double areaOfLargePizza = 0.0;
+   double areaOfMediumPizza = 0.0;
+   double areaOfSmallPizza = 0.0;
+   double totalAreaOfLarge = 0.0;
+   double totalAreaOfMedium = 0.0;
+   double totalAreaOfSmall = 0.0;
+   double totalAreaPizzaPurchase = 0.0;
+   double totalAreaPizzaGuestsEaten = 0.0;
+   double percentageOfTip = 0.0;
+   double totalCostOfLarge = 0.0;
+   double totalCostOfMedium = 0.0;
+   double totalCostOfSmall = 0.0;
+   double totalCostBeforeTip = 0.0;
+   double overallCost = 0.0;
+   
+   cout << "Please enter the number of guests: ";
+   cin >> numOfGuests;
+   cout << endl << endl;
+   
+   numOfLargePizzas = numOfGuests / LARGE_PIZZA_FEEDS;
+   leftoverPeopleAfterLarge = numOfGuests % LARGE_PIZZA_FEEDS;
+   numOfMediumPizzas = leftoverPeopleAfterLarge / MEDIUM_PIZZA_FEEDS;
+   leftoverPeopleAfterMedium = (numOfGuests % LARGE_PIZZA_FEEDS) % MEDIUM_PIZZA_FEEDS;
+   numOfSmallPizzas = leftoverPeopleAfterMedium / SMALL_PIZZA_FEEDS;
+   cout << numOfLargePizzas << " large pizzas, ";
+   cout << numOfMediumPizzas << " medium pizzas, and ";
+   cout << numOfSmallPizzas << " small pizzas will be needed." << endl << endl;
+   
+   radiusOfLargePizza = DIAMETER_OF_LARGE_PIZZA / DIAMETER_DIVISOR;
+   radiusOfMediumPizza = DIAMETER_OF_MEDIUM_PIZZA / DIAMETER_DIVISOR;
+   radiusOfSmallPizza = DIAMETER_OF_SMALL_PIZZA / DIAMETER_DIVISOR;
+   areaOfLargePizza = PI * (pow (radiusOfLargePizza, POWER_SQUARED));
+   areaOfMediumPizza = PI * (pow (radiusOfMediumPizza, POWER_SQUARED));
+   areaOfSmallPizza = PI * (pow (radiusOfSmallPizza, POWER_SQUARED));
+   totalAreaOfLarge = numOfLargePizzas * areaOfLargePizza;
+   totalAreaOfMedium = numOfMediumPizzas * areaOfMediumPizza;
+   totalAreaOfSmall = numOfSmallPizzas * areaOfSmallPizza;
+   totalAreaPizzaPurchase = totalAreaOfLarge + totalAreaOfMedium + totalAreaOfSmall;
+   totalAreaPizzaGuestsEaten = totalAreaPizzaPurchase / numOfGuests;
+   cout << "A total of " << totalAreaPizzaPurchase;
+   cout << " square inches of pizza will be purchased ";
+   cout << "(" << totalAreaPizzaGuestsEaten << " per guest)." << endl << endl;
+   
+   cout << "Please enter the tip as a percentage (i.e. 10 means 10%): ";
+   cin >> percentageOfTip;
+   cout << endl << endl << endl;
+   
+   totalCostOfLarge = numOfLargePizzas * COST_OF_LARGE_PIZZA; 
+   totalCostOfMedium = numOfMediumPizzas * COST_OF_MEDIUM_PIZZA;
+   totalCostOfSmall = numOfSmallPizzas * COST_OF_SMALL_PIZZA;
+   totalCostBeforeTip = totalCostOfLarge + totalCostOfMedium + totalCostOfSmall;
+   overallCost = (totalCostBeforeTip * (percentageOfTip / TIP_DIVISOR)) + totalCostBeforeTip;
+   roundedCostValue = overallCost + ROUND_NUM;
+   cout << "The total cost of the event will be: $" << roundedCostValue << endl;
+   
+   return 0;
+}
